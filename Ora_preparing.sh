@@ -48,7 +48,7 @@ Linux)
 				binutils.x86_64 compat-db.x86_64 compat-libcap1.x86_64 compat-libstdc++-296.${bit32} compat-libstdc++-33.x86_64 compat-libstdc++-33.${bit32} \
 				elfutils-libelf-devel.x86_64 gcc.x86_64 gcc-c++.x86_64 glibc.x86_64 glibc.${bit32} glibc-devel.x86_64 glibc-devel.${bit32} ksh.x86_64 libaio.x86_64 net-tools.x86_64\
 				libaio-devel.x86_64 libaio.${bit32} libaio-devel.${bit32} libgcc.${bit32} libgcc.x86_64 libgnome.x86_64 libgnomeui.x86_64 libstdc++.x86_64 libstdc++-devel.x86_64 \
-				libstdc++.${bit32} libstdc++-devel.${bit32} libXp.${bit32} libXt.${bit32} libXtst.${bit32} make.x86_64 pdksh.x86_64 sysstat.x86_64 unixODBC.x86_64 \
+				libstdc++.${bit32} libstdc++-devel.${bit32} libXp.${bit32} libXt.${bit32} libXtst.x86_64 libXtst.${bit32} make.x86_64 pdksh.x86_64 sysstat.x86_64 unixODBC.x86_64 \
 				unixODBC-devel.x86_64 unixODBC.${bit32} unixODBC-devel.${bit32} xorg-x11-utils.x86_64
 		else
 			yum -y install bc nscd perl-TermReadKey unzip zip parted openssh-clients bind-utils wget nfs-utils smartmontools binutils compat-db compat-libcap1 compat-libstdc++-296 \
@@ -91,13 +91,13 @@ else
 	fi
 	$ECHO "The total physical memory is large than 16G, so the HugePage feature is recommended."
 	$ECHO "Do you want to enable it? (Y/y/Enter to accept, other to continue): \c"; read  A_HPAGE
-	[ [ -z $A_HPAGE ] || [ $A_HPAGE == "Y" ] || [ $A_HPAGE == "y" ] ] && { 
+	[ x"$A_HPAGE" == "x" ] || [ x"$A_HPAGE" == "xY" ] || [ x$A_HPAGE == "xy" ] && { 
 	$ECHO "Please input the expected total SGA size (include the ASM instance) in MB:\c"; read A_SGASIZE
 	if [ $A_SGASIZE -le 8192 ]; then
 		$ECHO "Normal memory page should be OK for such total SGA size, so will not configure HugePage."
 	else
 		HPG_SZ=`grep Hugepagesize /proc/meminfo | awk '{print $2}'`
-		if [ -z "$HPG_SZ" ]; then
+		if [ x"$HPG_SZ" == "x" ]; then
 			$ECHO "The HugePage may not be supported in this system."
 		else
 			NUM_HPAGE=`$ECHO "$A_SGASIZE*1024/$HPG_SZ+10"|bc`
@@ -252,7 +252,7 @@ else
 					ASMOPERGRP=$ASMADMGRP
 				fi
 			else
-				ASMDBGRP=$ASMADMGRP
+				ASMDBAGRP=$ASMADMGRP
 				ASMOPERGRP=$ASMADMGRP
 			fi
 			$ECHO "The default GI user is grid, OK for you? (Enter to accept, or input a new user name): \c"; read A_GIID
@@ -384,6 +384,7 @@ fi
 	#sysctl -a|grep -E -w '(fs.aio-max-nr|fs.file-max|kernel.shmall|kernel.shmmax|kernel.shmmni|kernel.sem|net.ipv4.ip_local_port_range|net.core.rmem_default|net.core.rmem_max|net.core.wmem_default|net.core.wmem_max|net.ipv4.tcp_wmem|net.ipv4.tcp_rmem)'
 	if ! grep '#Added for Oracle installation' /etc/sysctl.conf >/dev/null && [ ! -f /etc/sysctl.d/oracle.conf ]; then
 		SHMALL=`awk '/MemTotal/{printf "%.0f\n",$2/4*0.8}' /proc/meminfo`
+		[ $SHMALL -lt 2097152 ] && SHMALL=2097152
 		SHMMAX=`awk '/MemTotal/{printf "%.0f\n",$2*0.8*1024}' /proc/meminfo`
 		$ECHO "#Added for Oracle installation" > /tmp/sysctl.conf.tmp
 		cat >> /tmp/sysctl.conf.tmp <<-EOF
@@ -402,8 +403,8 @@ net.core.wmem_max = 2097152
 net.ipv4.tcp_wmem = 262144 262144 6291456
 net.ipv4.tcp_rmem = 4194304 4194304 4194304
 		EOF
-		[ -n $NUM_HPAGE ] && echo "vm.nr_hugepages = $NUM_HPAGE" >> /tmp/sysctl.conf.tmp
-		[ -n $MIN_FM ] && echo "vm.min_free_kbytes = $MIN_FM" >> /tmp/sysctl.conf.tmp
+		[ -n "$NUM_HPAGE" ] && echo "vm.nr_hugepages = $NUM_HPAGE" >> /tmp/sysctl.conf.tmp
+		[ -n "$MIN_FM" ] && echo "vm.min_free_kbytes = $MIN_FM" >> /tmp/sysctl.conf.tmp
 		#Disable Address Space Layout Randomization (ASLR) (Note 1345364.1)
 		sysctl kernel.randomize_va_space >/dev/null 2>&1  && echo "kernel.randomize_va_space = 0" >> /tmp/sysctl.conf.tmp
 		sysctl kernel.exec-shield >/dev/null 2>&1  && echo "kernel.exec-shield = 0" >> /tmp/sysctl.conf.tmp
