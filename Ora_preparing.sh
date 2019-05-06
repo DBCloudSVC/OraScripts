@@ -446,7 +446,7 @@ $uname  hard    memlock  536870912
 esac
 
 #Fix bug in RHEL7.2
-! grep '^RemoveIPC=no' /etc/systemd/logind.conf && echo "RemoveIPC=no" >> /etc/systemd/logind.conf
+[ -f /etc/systemd/logind.conf ] && ! grep '^RemoveIPC=no' /etc/systemd/logind.conf>/dev/null 2>&1 && echo "RemoveIPC=no" >> /etc/systemd/logind.conf
 
 #Try to disable transparent hugepages
 if [ -f /sys/kernel/mm/transparent_hugepage/enabled ] && ! grep '\[never\]' /sys/kernel/mm/transparent_hugepage/enabled > /dev/null; then
