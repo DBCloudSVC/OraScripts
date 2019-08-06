@@ -38,18 +38,19 @@ Linux)
 	if [ -f /etc/redhat-release ]; then
 		if uname -a|grep 'x86_64' >/dev/null
 		then
-			grep -E '(release 6|release 7)' /etc/redhat-release >/dev/null
+			grep -E '(release 6|release 7|release 8)' /etc/redhat-release >/dev/null
 			if [ $? -eq 0 ]; then
 				bit32=i686
+        grep 'release 8' /etc/redhat-release >/dev/null && DNFOPT='--setopt=strict=0'
 			else
 				bit32=i386
 			fi
-			yum -y install bc nscd perl-TermReadKey unzip zip parted openssh-clients bind-utils wget nfs-utils smartmontools\
+			yum -y $DNFOPT install tar bzip2 gzip install bc nscd perl-TermReadKey unzip zip parted openssh-clients bind-utils wget nfs-utils smartmontools\
 				binutils.x86_64 compat-db.x86_64 compat-libcap1.x86_64 compat-libstdc++-296.${bit32} compat-libstdc++-33.x86_64 compat-libstdc++-33.${bit32} \
 				elfutils-libelf-devel.x86_64 gcc.x86_64 gcc-c++.x86_64 glibc.x86_64 glibc.${bit32} glibc-devel.x86_64 glibc-devel.${bit32} ksh.x86_64 libaio.x86_64 net-tools.x86_64\
 				libaio-devel.x86_64 libaio.${bit32} libaio-devel.${bit32} libgcc.${bit32} libgcc.x86_64 libgnome.x86_64 libgnomeui.x86_64 libstdc++.x86_64 libstdc++-devel.x86_64 \
 				libstdc++.${bit32} libstdc++-devel.${bit32} libXp.${bit32} libXt.${bit32} libXtst.x86_64 libXtst.${bit32} make.x86_64 pdksh.x86_64 sysstat.x86_64 unixODBC.x86_64 \
-				unixODBC-devel.x86_64 unixODBC.${bit32} unixODBC-devel.${bit32} xorg-x11-utils.x86_64
+				unixODBC-devel.x86_64 unixODBC.${bit32} unixODBC-devel.${bit32} xorg-x11-utils.x86_64 libnsl.x86_64
 		else
 			yum -y install bc nscd perl-TermReadKey unzip zip parted openssh-clients bind-utils wget nfs-utils smartmontools binutils compat-db compat-libcap1 compat-libstdc++-296 \
 				compat-libstdc++-33 elfutils-libelf-devel gcc gcc-c++ glibc glibc-devel ksh libaio net-tools libaio-devel libgcc libgnome libgnomeui libstdc++ libstdc++-devel \
@@ -65,6 +66,12 @@ Linux)
 	fi
 	;;
 esac
+
+#Fix for RHEL8
+grep 'release 8' /etc/redhat-release >/dev/null && ( ln -s /lib64/libnsl.so.1 /lib64/libnsl.so 2>/dev/null; \
+  $ECHO
+  $ECHO "Please remember to downgrade your libaio* packages to RHEL7 level if you want to install Oracle 11g!"; \
+  read -p "Enter to continue..." )
 
 #Check the Memory and SWAP size
 ETSWAP=N
@@ -198,14 +205,14 @@ else
 	while [ $CONFMID != "YES" ]; do
 		#Check user and groups
 		$ECHO
-		$ECHO "Do you want to create seperate groups for different usage? (Y|N): \c"; read SPGRP
+		$ECHO "Do you want to create seperate groups for Oracle software installation? (Y|N): \c"; read SPGRP
 		if [ "$SPGRP" == "Y" -o "$SPGRP" == "y" ]; then
 			if [ -f $ORALOC ]; then
 				OIGRP=`grep inst_group $ORALOC|awk -F= '{print $2}'|sed 's/ //g'`
 			else
 				OIGRP=oinstall
 			fi
-			$ECHO "The Oracle inventory group is ${OIGRP}, OK for you? (Enter to accept, or input a new group name): \c"; read A_OIGRP
+			$ECHO "The Oracle software installation group is ${OIGRP}, OK for you? (Enter to accept, or input a new group name): \c"; read A_OIGRP
 			if [ "x$A_OIGRP" != "x" ]; then
 				OIGRP=$A_OIGRP
 			fi
@@ -231,7 +238,7 @@ else
 
 		$ECHO "Do you want to install GI (Y|N)? \c"; read INGI
 		if [ "$INGI" == "Y" -o "$INGI" == "y" ]; then
-			$ECHO "Do you want to create seperate groups for GI installation? (Y|N)? \c"; read SPGI
+			$ECHO "Do you want to create seperated groups for GI installation? (Y|N)? \c"; read SPGI
 			$ECHO "The default ASM administration group is asmadmin, OK for you? (Enter to accept, or input a new group name): \c"; read A_ASMADMGRP
 			if [ "x$A_ASMADMGRP" != "x" ]; then
 				ASMADMGRP=$A_ASMADMGRP
