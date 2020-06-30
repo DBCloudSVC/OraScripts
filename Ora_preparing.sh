@@ -74,6 +74,7 @@ grep 'release 8' /etc/redhat-release >/dev/null && (
     ln -s /lib64/libnsl.so.1 /lib64/libnsl.so 2>/dev/null
     $ECHO
     $ECHO "Please remember to downgrade your libaio* packages to RHEL7 level if you want to install Oracle 11g!"
+    $ECHO "And after the downgrade, better run 'yum install yum-plugin-versionlock' then run 'yum versionlock libaio*' to lock them."
     read -p "Enter to continue..."
 )
 
