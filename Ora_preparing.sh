@@ -49,7 +49,7 @@ Linux)
 				binutils.x86_64 compat-db.x86_64 compat-libcap1.x86_64 compat-libstdc++-296.${bit32} compat-libstdc++-33.x86_64 compat-libstdc++-33.${bit32} \
 				elfutils-libelf-devel.x86_64 gcc.x86_64 gcc-c++.x86_64 glibc.x86_64 glibc.${bit32} glibc-devel.x86_64 glibc-devel.${bit32} ksh.x86_64 libaio.x86_64 net-tools.x86_64\
 				libaio-devel.x86_64 libaio.${bit32} libaio-devel.${bit32} libgcc.${bit32} libgcc.x86_64 libgnome.x86_64 libgnomeui.x86_64 libstdc++.x86_64 libstdc++-devel.x86_64 \
-				libstdc++.${bit32} libstdc++-devel.${bit32} libXp.${bit32} libXt.${bit32} libXtst.x86_64 libXtst.${bit32} make.x86_64 pdksh.x86_64 sysstat.x86_64 unixODBC.x86_64 \
+				libstdc++.${bit32} libstdc++-devel.${bit32} libXp.${bit32} libXt.${bit32} libXtst.x86_64 libXtst.${bit32} make.x86_64 pdksh.x86_64 psmisc.x86_64 sysstat.x86_64 unixODBC.x86_64 \
 				unixODBC-devel.x86_64 unixODBC.${bit32} unixODBC-devel.${bit32} xorg-x11-utils.x86_64 libnsl.x86_64
 		else
 			yum -y install bc nscd perl-TermReadKey unzip zip parted openssh-clients bind-utils wget nfs-utils smartmontools binutils compat-db compat-libcap1 compat-libstdc++-296 \
