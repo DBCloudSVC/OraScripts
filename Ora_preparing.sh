@@ -58,7 +58,7 @@ Linux)
                 compat-libstdc++-33 elfutils-libelf-devel gcc gcc-c++ glibc glibc-devel ksh libaio net-tools libaio-devel libgcc libgnome libgnomeui libstdc++ libstdc++-devel \
                 libXp libXt libXtst make pdksh sysstat unixODBC unixODBC-devel xorg-x11-utils
         fi
-    elif [ -f /etc/SuSE-release ]; then
+    elif [ -f /etc/SuSE-release -o -f /etc/SUSE-brand ]; then
         if uname -a | grep 'x86_64' >/dev/null; then
             zypper -n in -l --no-recommends binutils gcc gcc48 glibc glibc-32bit glibc-devel glibc-devel-32bit \
                 mksh libaio1 libaio-devel libcap1 libstdc++48-devel libstdc++48-devel-32bit libstdc++6 libstdc++6-32bit \
@@ -70,7 +70,7 @@ Linux)
 esac
 
 #Fix for RHEL8
-grep 'release 8' /etc/redhat-release >/dev/null && (
+grep 'release 8' /etc/redhat-release >/dev/null 2>&1 && (
     ln -s /lib64/libnsl.so.1 /lib64/libnsl.so 2>/dev/null
     $ECHO
     $ECHO "Please remember to downgrade your libaio* packages to RHEL7 level if you want to install Oracle 11g!"
