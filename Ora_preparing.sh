@@ -485,6 +485,8 @@ if [ -f /sys/kernel/mm/transparent_hugepage/enabled ] && ! grep '\[never\]' /sys
     }
     [ -f /boot/grub/grub.conf ] && ! grep "kernel.*$(uname -r).* transparent_hugepage=never" /boot/grub/grub.conf &&
         sed -i.orap-bak -e "/kernel.*$(uname -r)/s/\(kernel.*\)/\1 transparent_hugepage=never/" /boot/grub/grub.conf
+    [ -f /boot/efi/EFI/*/grub.conf ] && ! grep "kernel.*$(uname -r).* transparent_hugepage=never" /boot/efi/EFI/*/grub.conf &&
+        sed -i.orap-bak -e "/kernel.*$(uname -r)/s/\(kernel.*\)/\1 transparent_hugepage=never/" /boot/efi/EFI/*/grub.conf
 
     #Update kernel tune profile
     tuned-adm active 2>&1 | grep 'Current active profile' >/dev/null && {
